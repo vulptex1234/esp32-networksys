@@ -17,7 +17,7 @@ machine.freq(240000000)
 ##################################
 ##    Network Configuration     ##
 ##################################
-from password import *
+from passwords import *
 SSID_NAME_HOME = ['oh_sour']
 SSID_NAME_LAB = ['CDSL-A910-11n']
 SSID_NAME_ESP = ['ESP_F']

@@ -1,11 +1,7 @@
 import boot
-import calc
-
 import socket
 import time
 import _thread
-import csv
-import os
 
 PORT = 80
 listen_socket = None
@@ -48,19 +44,34 @@ def parse_data(data):
         parts = data.split(',')
         node_id = int(parts[0].strip())
         battery = int(parts[1].strip())
-        nodes = list(map(int, parts[2].strip().split()))  # ノードはスペース区切りのリストと仮定
+        nodes = parts[2].strip().split()  # ノードはスペース区切りのリストと仮定
         return {"Node_ID": node_id, "Battery": battery, "Nodes": nodes}
     except Exception as e:
         print(f"Failed to parse data: {e}")
         return None
 
+def file_exists(file_path):
+    try:
+        with open(file_path, 'r'):
+            pass
+        return True
+    except OSError:
+        return False
+
 def save_to_csv(node_data):
-    file_exists = os.path.isfile(csv_file)
-    with open(csv_file, mode='a', newline='') as file:
-        writer = csv.writer(file)
-        if not file_exists:
-            writer.writerow(["Node_ID", "Battery", "Nodes"])  # ヘッダーを書き込む
-        writer.writerow([node_data["Node_ID"], node_data["Battery"], ' '.join(map(str, node_data["Nodes"]))])
+    file_exists_flag = file_exists(csv_file)
+    with open(csv_file, mode='a') as file:
+        if not file_exists_flag:
+            file.write("Node_ID,Battery,Nodes\n")  # ヘッダーを書き込む
+        file.write(f"{node_data['Node_ID']},{node_data['Battery']},{' '.join(node_data['Nodes'])}\n")
+
+    Data = []
+    with open(csv_file, mode='r') as file:
+        for l in file:
+            l = l.rstrip(',')
+            l = l.rstrip('\n')
+            Data.append(l.split(','))
+    print(Data)
 
 if __name__ == '__main__':
     # boot.connect_home_wifi()

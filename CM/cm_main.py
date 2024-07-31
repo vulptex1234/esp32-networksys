@@ -3,8 +3,6 @@ import socket
 import time
 import _thread
 
-# import get_current
-
 s = None
 
 def send():
@@ -29,7 +27,12 @@ def send_to_server():
         time.sleep(5)
         if send():
             while True:
-                msg = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
+                # Node_ID, Battery, Nodesのペアを生成
+                Node_ID = 2
+                Battery = 90
+                Nodes = [2, 3, 4]
+                msg = f'{Node_ID},{Battery},"{" ".join(map(str, Nodes))}"'
+                
                 try:
                     s.sendall(msg.encode())
                     print(f"Sent: {msg}")
