@@ -2,6 +2,7 @@ import boot
 import socket
 import time
 import _thread
+import random
 
 s = None
 
@@ -28,8 +29,9 @@ def send_to_server():
         if send():
             while True:
                 # Node_ID, Battery, Nodesのペアを生成
-                Node_ID = 2
-                Battery = 90
+                
+                Node_ID = 1
+                Battery = random.randint(0,100)
                 Nodes = [2, 3, 4]
                 msg = f'{Node_ID},{Battery},"{" ".join(map(str, Nodes))}"'
                 

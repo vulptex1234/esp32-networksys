@@ -63,12 +63,13 @@ def read_csv(file_path):
     try:
         with open(file_path, 'r') as file:
             lines = file.readlines()
-            for line in lines:
+            for line in lines[1:]:  # ヘッダー行をスキップ
                 parts = line.strip().split(',')
-                node_id = int(parts[0].strip())
-                battery = int(parts[1].strip())
-                nodes = parts[2].strip().split()
-                data.append({"Node_ID": node_id, "Battery": battery, "Nodes": nodes})
+                if len(parts) >= 3:  # 正しい形式の行だけを処理
+                    node_id = int(parts[0].strip())
+                    battery = int(parts[1].strip())
+                    nodes = parts[2].strip().split()
+                    data.append({"Node_ID": node_id, "Battery": battery, "Nodes": nodes})
     except OSError as e:
         print(f"Failed to read CSV: {e}")
     return data
@@ -79,6 +80,15 @@ def write_csv(file_path, data):
             file.write("Node_ID,Battery,Nodes\n")  # ヘッダーを書き込む
             for entry in data:
                 file.write(f"{entry['Node_ID']},{entry['Battery']},{' '.join(entry['Nodes'])}\n")
+
+        Data = []
+        with open(file_path, 'r') as file:
+            for l in file:
+                l = l.rstrip(',')
+                l = l.rstrip('\n')
+                Data.append(l.split(','))
+        print(Data)
+
     except OSError as e:
         print(f"Failed to write CSV: {e}")
 
