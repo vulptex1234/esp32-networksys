@@ -31,7 +31,7 @@ def handle_client(conn, addr):
             # 受け取ったデータをCSVに格納
             node_data = parse_data(decoded_data)
             if node_data:
-                save_to_csv(node_data)
+                update_csv(node_data)
                 
         except OSError as e:
             print(f"Connection error: {e}")
@@ -58,20 +58,46 @@ def file_exists(file_path):
     except OSError:
         return False
 
-def save_to_csv(node_data):
-    file_exists_flag = file_exists(csv_file)
-    with open(csv_file, mode='a') as file:
-        if not file_exists_flag:
-            file.write("Node_ID,Battery,Nodes\n")  # ヘッダーを書き込む
-        file.write(f"{node_data['Node_ID']},{node_data['Battery']},{' '.join(node_data['Nodes'])}\n")
+def read_csv(file_path):
+    data = []
+    try:
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+            for line in lines:
+                parts = line.strip().split(',')
+                node_id = int(parts[0].strip())
+                battery = int(parts[1].strip())
+                nodes = parts[2].strip().split()
+                data.append({"Node_ID": node_id, "Battery": battery, "Nodes": nodes})
+    except OSError as e:
+        print(f"Failed to read CSV: {e}")
+    return data
 
-    Data = []
-    with open(csv_file, mode='r') as file:
-        for l in file:
-            l = l.rstrip(',')
-            l = l.rstrip('\n')
-            Data.append(l.split(','))
-    print(Data)
+def write_csv(file_path, data):
+    try:
+        with open(file_path, 'w') as file:
+            file.write("Node_ID,Battery,Nodes\n")  # ヘッダーを書き込む
+            for entry in data:
+                file.write(f"{entry['Node_ID']},{entry['Battery']},{' '.join(entry['Nodes'])}\n")
+    except OSError as e:
+        print(f"Failed to write CSV: {e}")
+
+def update_csv(new_data):
+    if file_exists(csv_file):
+        data = read_csv(csv_file)
+        updated = False
+        for entry in data:
+            if entry["Node_ID"] == new_data["Node_ID"]:
+                entry["Battery"] = new_data["Battery"]
+                entry["Nodes"] = new_data["Nodes"]
+                updated = True
+                break
+        if not updated:
+            data.append(new_data)
+    else:
+        data = [new_data]
+    
+    write_csv(csv_file, data)
 
 if __name__ == '__main__':
     # boot.connect_home_wifi()
