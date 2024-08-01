@@ -30,7 +30,7 @@ def send_to_server():
             while True:
                 # Node_ID, Battery, Nodesのペアを生成
                 
-                Node_ID = 2
+                Node_ID = 1
                 Battery = random.randint(0,100)
                 Nodes_number = 4
                 msg = f'{Node_ID},{Battery},{Nodes_number}'

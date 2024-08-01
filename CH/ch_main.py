@@ -10,6 +10,10 @@ listen_socket = None
 csv_file = 'node_data.csv'
 param_dict = {}
 
+# 期待されるクライアントの数を指定
+expected_clients = 2
+received_clients = []
+
 def start_server():
     global listen_socket
     ip = boot.ap.ifconfig()[0]
@@ -20,7 +24,7 @@ def start_server():
     print(f"Server started at {ip}:{PORT}")
 
 def handle_client(conn, addr):
-    global param_dict
+    global param_dict, received_clients
     print('Connected from: ', addr)
     while True:
         try:
@@ -36,10 +40,24 @@ def handle_client(conn, addr):
             node_data = parse_data(decoded_data)
             if node_data:
                 update_csv(node_data)
-                print('Updated param_dict:', param_dict)  # 追加: param_dictの内容を確認
-                cluster_head = calc.head_selection(param_dict)
-                send_cluster_head(conn, cluster_head)
                 
+                # クライアントの接続オブジェクトをトラッキング
+                if conn not in received_clients:
+                    received_clients.append(conn)
+                
+                # すべてのクライアントからデータを受信したか確認
+                if len(received_clients) == expected_clients:
+                    print('All clients data received. Processing...')
+                    param_dict = calc.extract_from_csv()  # param_dictをcalc.extract_from_csvで更新
+                    print('param_dict after extract_from_csv:', param_dict)  # 追加: param_dict の内容を確認
+                    
+                    cluster_head = calc.head_selection(param_dict)
+                    for client in received_clients:
+                        send_cluster_head(client, cluster_head)
+                    
+                    # 受信したクライアントリストをクリア
+                    received_clients = []
+
         except OSError as e:
             print(f"Connection error: {e}")
             conn.close()
@@ -116,13 +134,11 @@ def update_csv(new_data):
         data = [new_data]
     
     write_csv(csv_file, data)
-    param_dict = calc.extract_from_csv()  # calc.extract_from_csvから返される値でparam_dictを更新
-    print('param_dict after extract_from_csv:', param_dict)  # 追加: param_dict の内容を確認
 
-def send_cluster_head(conn, cluster_head):
+def send_cluster_head(client, cluster_head):
     try:
         msg = f"Cluster_Head,{cluster_head}"
-        conn.sendall(msg.encode())
+        client.sendall(msg.encode())
         print(f"Sent cluster head info: {msg}")
     except OSError as e:
         print(f"Failed to send cluster head info: {e}")
