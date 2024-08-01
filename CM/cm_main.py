@@ -3,6 +3,7 @@ import socket
 import time
 import _thread
 import random
+import machine
 
 s = None
 
@@ -48,6 +49,7 @@ def send_to_server():
                     s.close()
                     break
                 time.sleep(30)
+                machine.reset()
         else:
             print("Socket connection failed")
     else:

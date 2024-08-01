@@ -4,6 +4,7 @@ import calc
 import socket
 import time
 import _thread
+import machine
 
 PORT = 80
 listen_socket = None
@@ -56,7 +57,9 @@ def handle_client(conn, addr):
                         send_cluster_head(client, cluster_head)
                     
                     # 受信したクライアントリストをクリア
-                    received_clients = []
+                    # received_clients = []
+                    time.sleep(3)
+                    machine.reset()
 
         except OSError as e:
             print(f"Connection error: {e}")
@@ -140,6 +143,7 @@ def send_cluster_head(client, cluster_head):
         msg = f"Cluster_Head,{cluster_head}"
         client.sendall(msg.encode())
         print(f"Sent cluster head info: {msg}")
+        
     except OSError as e:
         print(f"Failed to send cluster head info: {e}")
 
@@ -153,6 +157,7 @@ if __name__ == '__main__':
         try:
             conn, addr = listen_socket.accept()
             _thread.start_new_thread(handle_client, (conn, addr))
+            
         except OSError as e:
             print(f"Accept error: {e}")
             continue
