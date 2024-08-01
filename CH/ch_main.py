@@ -1,4 +1,6 @@
 import boot
+import calc
+
 import socket
 import time
 import _thread
@@ -6,6 +8,7 @@ import _thread
 PORT = 80
 listen_socket = None
 csv_file = 'node_data.csv'
+param_dict = {}
 
 def start_server():
     global listen_socket
@@ -44,7 +47,7 @@ def parse_data(data):
         parts = data.split(',')
         node_id = int(parts[0].strip())
         battery = int(parts[1].strip())
-        nodes = parts[2].strip().split()  # ノードはスペース区切りのリストと仮定
+        nodes = int(parts[2].strip())  # ノードはスペース区切りのリストと仮定
         return {"Node_ID": node_id, "Battery": battery, "Nodes": nodes}
     except Exception as e:
         print(f"Failed to parse data: {e}")
@@ -68,7 +71,7 @@ def read_csv(file_path):
                 if len(parts) >= 3:  # 正しい形式の行だけを処理
                     node_id = int(parts[0].strip())
                     battery = int(parts[1].strip())
-                    nodes = parts[2].strip().split()
+                    nodes = int(parts[2].strip())
                     data.append({"Node_ID": node_id, "Battery": battery, "Nodes": nodes})
     except OSError as e:
         print(f"Failed to read CSV: {e}")
@@ -79,7 +82,7 @@ def write_csv(file_path, data):
         with open(file_path, 'w') as file:
             file.write("Node_ID,Battery,Nodes\n")  # ヘッダーを書き込む
             for entry in data:
-                file.write(f"{entry['Node_ID']},{entry['Battery']},{' '.join(entry['Nodes'])}\n")
+                file.write(f"{entry['Node_ID']},{entry['Battery']},{entry['Nodes']}\n")
 
         Data = []
         with open(file_path, 'r') as file:
@@ -108,6 +111,7 @@ def update_csv(new_data):
         data = [new_data]
     
     write_csv(csv_file, data)
+    calc.extract_from_csv()
 
 if __name__ == '__main__':
     # boot.connect_home_wifi()
