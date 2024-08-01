@@ -20,21 +20,25 @@ def start_server():
     print(f"Server started at {ip}:{PORT}")
 
 def handle_client(conn, addr):
-    print('connected from: ', addr)
+    global param_dict
+    print('Connected from: ', addr)
     while True:
         try:
             data = conn.recv(1024)
             if not data:
-                print('close socket')
+                print('Close socket')
                 conn.close()
                 break
             decoded_data = data.decode()
-            print(decoded_data)
+            print('Received data:', decoded_data)
             
             # 受け取ったデータをCSVに格納
             node_data = parse_data(decoded_data)
             if node_data:
                 update_csv(node_data)
+                print('Updated param_dict:', param_dict)  # 追加: param_dictの内容を確認
+                cluster_head = calc.head_selection(param_dict)
+                send_cluster_head(conn, cluster_head)
                 
         except OSError as e:
             print(f"Connection error: {e}")
@@ -90,12 +94,13 @@ def write_csv(file_path, data):
                 l = l.rstrip(',')
                 l = l.rstrip('\n')
                 Data.append(l.split(','))
-        print(Data)
+        print('CSV Data:', Data)  # 追加: CSVの内容を確認
 
     except OSError as e:
         print(f"Failed to write CSV: {e}")
 
 def update_csv(new_data):
+    global param_dict  # 追加: param_dict をグローバル変数として宣言
     if file_exists(csv_file):
         data = read_csv(csv_file)
         updated = False
@@ -111,7 +116,16 @@ def update_csv(new_data):
         data = [new_data]
     
     write_csv(csv_file, data)
-    calc.extract_from_csv()
+    param_dict = calc.extract_from_csv()  # calc.extract_from_csvから返される値でparam_dictを更新
+    print('param_dict after extract_from_csv:', param_dict)  # 追加: param_dict の内容を確認
+
+def send_cluster_head(conn, cluster_head):
+    try:
+        msg = f"Cluster_Head,{cluster_head}"
+        conn.sendall(msg.encode())
+        print(f"Sent cluster head info: {msg}")
+    except OSError as e:
+        print(f"Failed to send cluster head info: {e}")
 
 if __name__ == '__main__':
     # boot.connect_home_wifi()
@@ -119,7 +133,7 @@ if __name__ == '__main__':
     start_server()
 
     while True:
-        print('accepting......')
+        print('Accepting......')
         try:
             conn, addr = listen_socket.accept()
             _thread.start_new_thread(handle_client, (conn, addr))

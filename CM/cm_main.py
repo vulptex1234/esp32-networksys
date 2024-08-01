@@ -38,8 +38,13 @@ def send_to_server():
                 try:
                     s.sendall(msg.encode())
                     print(f"Sent: {msg}")
+                    
+                    # サーバーからの応答を待つ
+                    response = s.recv(1024)
+                    if response:
+                        print(f"Received: {response.decode()}")
                 except OSError as e:
-                    print(f"Send failed: {e}")
+                    print(f"Send/Receive failed: {e}")
                     s.close()
                     break
                 time.sleep(30)
@@ -49,4 +54,4 @@ def send_to_server():
         print("Wi-Fi connection failed")
 
 if __name__ == '__main__':
-    _thread.start_new_thread(send_to_server,())
+    _thread.start_new_thread(send_to_server, ())
