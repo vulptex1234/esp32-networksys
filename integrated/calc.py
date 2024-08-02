@@ -1,6 +1,13 @@
 import math
 import ch_main
 
+def normalize(node):
+    with open('node_data.csv', 'r') as file:
+        lines = file.readlines()
+        for line in lines[1:]:
+            parts = line.strip()
+    return True
+
 def sim_score(current_head, node, battery_weight=1.0, comm_weight=1.0, battery_penalty_factor=2, comm_penalty_factor=2):
     battery_current, comm_nodes_current = current_head
     battery_node, comm_nodes_node = node

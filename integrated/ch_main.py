@@ -12,7 +12,7 @@ csv_file = 'node_data.csv'
 param_dict = {}
 
 # 期待されるクライアントの数を指定
-expected_clients = 1
+expected_clients = 2
 received_clients = []
 
 def start_server():
@@ -49,24 +49,27 @@ def handle_client(conn, addr):
                 # すべてのクライアントからデータを受信したか確認
                 if len(received_clients) == expected_clients:
                     print('All clients data received. Processing...')
-                    param_dict = calc.extract_from_csv()  # param_dictをcalc.extract_from_csvで更新
-                    print('param_dict after extract_from_csv:', param_dict)  # 追加: param_dict の内容を確認
-                    
-                    cluster_head = calc.head_selection(param_dict)
-                    for client in received_clients:
-                        send_cluster_head(client, cluster_head)
-                    
-                    # 受信したクライアントリストをクリア
-                    # received_clients = []
-                    time.sleep(3)
+                    try:
+                        param_dict = calc.extract_from_csv()  # param_dictをcalc.extract_from_csvで更新
+                        print('param_dict after extract_from_csv:', param_dict)  # 追加: param_dict の内容を確認
+                        
+                        cluster_head = calc.head_selection(param_dict)
+                        for client in received_clients:
+                            send_cluster_head(client, cluster_head)
+                        
+                        # 受信したクライアントリストをクリア
+                        received_clients = []
+                        time.sleep(3)
 
-                    # Flag処理(Test)
-                    new_flag = 'False'
-                    with open('flag.txt', 'w') as file:
-                        file.write(new_flag)
+                        # Flag処理(Test)
+                        new_flag = 'False'
+                        with open('flag.txt', 'w') as file:
+                            file.write(new_flag)
 
-                    machine.reset()
+                        machine.reset()
 
+                    except ValueError as ve:
+                        print(f"Error processing CSV data: {ve}")
         except OSError as e:
             print(f"Connection error: {e}")
             conn.close()
@@ -100,10 +103,13 @@ def read_csv(file_path):
             for line in lines[1:]:  # ヘッダー行をスキップ
                 parts = line.strip().split(',')
                 if len(parts) >= 3:  # 正しい形式の行だけを処理
-                    node_id = int(parts[0].strip())
-                    battery = int(parts[1].strip())
-                    nodes = int(parts[2].strip())
-                    data.append({"Node_ID": node_id, "Battery": battery, "Nodes": nodes})
+                    try:
+                        node_id = int(parts[0].strip())
+                        battery = int(parts[1].strip())
+                        nodes = int(parts[2].strip())
+                        data.append({"Node_ID": node_id, "Battery": battery, "Nodes": nodes})
+                    except ValueError as ve:
+                        print(f"ValueError: {ve} for line: {line.strip()}")
     except OSError as e:
         print(f"Failed to read CSV: {e}")
     return data
