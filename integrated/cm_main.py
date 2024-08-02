@@ -50,17 +50,18 @@ def send_to_server():
                     break
                 # time.sleep(30)
                 time.sleep(3)
-
+                
                 # Flag処理(Test)
-                new_flag = True
+                new_flag = 'True'
                 with open('flag.txt', 'w') as file:
                     file.write(new_flag)
-
+                
                 machine.reset()
         else:
             print("Socket connection failed")
     else:
         print("Wi-Fi connection failed")
+        send_to_server()
 
 if __name__ == '__main__':
     _thread.start_new_thread(send_to_server, ())

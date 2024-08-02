@@ -14,6 +14,8 @@ blue = Pin(27, Pin.OUT)
 
 machine.freq(240000000)
 
+hm_flag = False
+
 ##################################
 ##    Network Configuration     ##
 ##################################
@@ -159,10 +161,31 @@ def ap_deactivate():
     print("----  AP is deactivated -----")
 
 ##################################
-##    System     ##
+##           System             ##
 ##################################
+def flag():
+    try:
+        with open('flag.txt', 'r') as f:
+            flag = f.read().strip()
+            print(f"flag:{flag}")
+            if flag == 'False':
+                print("execute CM mode")
+                execfile('cm_main.py')
+            elif flag == 'True':
+                print("execute CH mode")
+                execfile('ch_main.py')
+            else:
+                print("Invalid flag value")
+                return
+    except FileNotFoundError:
+        print("flag.txt is not found")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
 print('booted system')
 
 if __name__ == '__main__':
-    execfile('cm_main.py')
+    flag()
+    # execfile('ch_main.py')
     # execfile('debug.py')
