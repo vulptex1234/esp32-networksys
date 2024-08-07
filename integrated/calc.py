@@ -1,12 +1,54 @@
 import math
 import ch_main
 
-def normalize(node):
+def normalize():
     with open('node_data.csv', 'r') as file:
         lines = file.readlines()
+        battery_max = 0
+        battery_min = 1000000
+        node_max = 0
+        node_min = 100000
+        normalized_data = []
+
+        # Find min and max values for battery and nodes
         for line in lines[1:]:
-            parts = line.strip()
-    return True
+            parts = line.strip().split(',')
+            battery = int(parts[1].strip())
+            node = int(parts[2].strip())
+            if battery >= battery_max:
+                battery_max = battery
+            if battery <= battery_min:
+                battery_min = battery
+            if node >= node_max:
+                node_max = node
+            if node <= node_min:
+                node_min = node
+
+        # Normalize the data
+        for line in lines[1:]:
+            parts = line.strip().split(',')
+            id = int(parts[0].strip())
+            battery = int(parts[1].strip())
+            node = int(parts[2].strip())
+
+            battery_norm = (battery - battery_min) / (battery_max - battery_min)
+            node_norm = (node - node_min) / (node_max - node_min)
+
+            normalized_data.append(f"{id},{battery_norm},{node_norm}\n")
+
+        # Write the normalized data to a new CSV file
+        with open('normalized_node_data.csv', 'w') as outfile:
+            outfile.write('Node_ID,Battery_Normalized,Nodes_Normalized\n')
+            outfile.writelines(normalized_data)
+
+        print(f'battery: max={battery_max}, min={battery_min}')
+        print(f'node: max={node_max}, min={node_min}')
+        
+    return normalized_data
+
+# 実行
+normalized_data = normalize()
+print("Normalized data written to 'normalized_node_data.csv'")
 
 def sim_score(current_head, node, battery_weight=1.0, comm_weight=1.0, battery_penalty_factor=2, comm_penalty_factor=2):
     battery_current, comm_nodes_current = current_head
