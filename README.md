@@ -28,6 +28,8 @@ Normalize battery and number of connectable nodes.
 Reading battery and number of connectable nodes from 'node_data.csv', normalize these 2 parameters.
 Then, write the normalized data to 'normalized_node_data.csv'
 
+### extract_from_csv()
 extract_from_csv() extracts 2 values from 'normalized_node_data.csv' and call sim_score().
 
+### sim_score()
 sim_score() calculates euclidian distance using given 2 arguments from extract_from_csv().
