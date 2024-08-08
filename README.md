@@ -1,4 +1,4 @@
-Create passwords.py in each folder(CH, CM, CM_monitor)
+Create passwords.py in each folder
 # Integrated Folder
 Import this folder to your esp32
 
