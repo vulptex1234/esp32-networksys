@@ -70,23 +70,43 @@ def sim_score(current_head, node, battery_weight=1.0, comm_weight=1.0, battery_p
     weighted_distance = math.sqrt((battery_diff * battery_weight)**2 + (comm_nodes_diff * comm_weight)**2)
     return weighted_distance
 
-def extract_from_csv():
-    c_head = (100, 5)  # test use
-    param_dict = {}
+# def extract_from_csv():
+#     c_head = (100, 5)  # test use
+#     param_dict = {}
 
-    with open('node_data.csv', 'r') as file:
+#     with open('node_data.csv', 'r') as file:
+#         lines = file.readlines()
+#         for line in lines[1:]:
+#             parts = line.strip().split(',')
+#             node_id = int(parts[0].strip())
+#             battery = int(parts[1].strip())
+#             node_number = int(parts[2].strip())
+
+#             print(node_id, battery, node_number)
+#             node = (battery, node_number)
+
+#             param = sim_score(c_head, node)
+#             param_dict[node_id] = param
+
+#     print('param_dict in extract_from_csv:', param_dict)  # 追加: param_dictの内容を確認
+#     return param_dict
+
+def extract_from_csv_norm():
+    param_dict = {}
+    with open('normalized_node_data.csv','r') as file:
         lines = file.readlines()
-        for line in lines[1:]:
+        for line in lines[1:]: #正規化の時は2:, 通常の値の時は1
             parts = line.strip().split(',')
             node_id = int(parts[0].strip())
-            battery = int(parts[1].strip())
-            node_number = int(parts[2].strip())
-
-            print(node_id, battery, node_number)
-            node = (battery, node_number)
-
-            param = sim_score(c_head, node)
-            param_dict[node_id] = param
+            battery = float(parts[1].strip())
+            node_number = float(parts[2].strip())
+            if node_id == 0:
+                c_head = (battery, node_number)
+            else:
+                print(node_id, battery, node_number)
+                node = (battery, node_number)
+                param = sim_score(c_head, node)
+                param_dict[node_id] = param
 
     print('param_dict in extract_from_csv:', param_dict)  # 追加: param_dictの内容を確認
     return param_dict
