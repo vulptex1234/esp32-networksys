@@ -10,6 +10,8 @@ PORT = 80
 listen_socket = None
 csv_file = 'node_data.csv'
 param_dict = {}
+with open('ID.txt', 'r') as file:
+    Node_ID = int(file.readline().strip())
 
 # 期待されるクライアントの数を指定
 expected_clients = 2
@@ -50,8 +52,8 @@ def handle_client(conn, addr):
                 if len(received_clients) == expected_clients:
                     print('All clients data received. Processing...')
                     try:
-                        param_dict = calc.extract_from_csv()  # param_dictをcalc.extract_from_csvで更新
-                        print('param_dict after extract_from_csv:', param_dict)  # 追加: param_dict の内容を確認
+                        param_dict = calc.extract_from_csv_norm()  # param_dictをcalc.extract_from_csvで更新
+                        print('param_dict after extract_from_csv_norm:', param_dict)  # 追加: param_dict の内容を確認
                         
                         cluster_head = calc.head_selection(param_dict)
                         for client in received_clients:
@@ -62,7 +64,10 @@ def handle_client(conn, addr):
                         time.sleep(3)
 
                         # Flag処理(Test)
-                        new_flag = 'False'
+                        if cluster_head == Node_ID:
+                            new_flag = 'True'
+                        else:
+                            new_flag = 'False'
                         with open('flag.txt', 'w') as file:
                             file.write(new_flag)
 
@@ -152,7 +157,7 @@ def update_csv(new_data):
 
 def send_cluster_head(client, cluster_head):
     try:
-        msg = f"Cluster_Head,{cluster_head}"
+        msg = f"{cluster_head}"
         client.sendall(msg.encode())
         print(f"Sent cluster head info: {msg}")
         

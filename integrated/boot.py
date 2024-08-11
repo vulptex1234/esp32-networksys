@@ -177,8 +177,6 @@ def flag():
             else:
                 print("Invalid flag value")
                 return
-    except FileNotFoundError:
-        print("flag.txt is not found")
     except Exception as e:
         print(f"An error occurred: {e}")
 

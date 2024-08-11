@@ -31,7 +31,8 @@ def send_to_server():
             while True:
                 # Node_ID, Battery, Nodesのペアを生成
                 
-                Node_ID = 1
+                with open('ID.txt', 'r') as file:
+                    Node_ID = int(file.readline())
                 Battery = random.randint(0,100)
                 Nodes_number = 4
                 msg = f'{Node_ID},{Battery},{Nodes_number}'
@@ -52,7 +53,10 @@ def send_to_server():
                 time.sleep(3)
                 
                 # Flag処理(Test)
-                new_flag = 'True'
+                if int(response.decode().strip()) == Node_ID:
+                    new_flag = 'True'
+                else:
+                    new_flag = 'False'
                 with open('flag.txt', 'w') as file:
                     file.write(new_flag)
                 
