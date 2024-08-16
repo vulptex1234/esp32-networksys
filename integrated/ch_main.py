@@ -1,10 +1,10 @@
 import boot
 import calc
-
 import socket
 import time
 import _thread
 import machine
+from get_current import remaining_battery_percentage
 
 PORT = 80
 listen_socket = None
@@ -13,9 +13,9 @@ param_dict = {}
 with open('ID.txt', 'r') as file:
     Node_ID = int(file.readline().strip())
 
-# 期待されるクライアントの数を指定
 expected_clients = 2
 received_clients = []
+connected_nodes = 2  # 例: ハードコードで5と設定
 
 def start_server():
     global listen_socket
@@ -29,6 +29,17 @@ def start_server():
 def handle_client(conn, addr):
     global param_dict, received_clients
     print('Connected from: ', addr)
+
+    # 自ノードのデータを準備
+    own_node_data = {
+        "Node_ID": Node_ID,
+        "Battery": int(remaining_battery_percentage),  # バッテリー残量を整数に変換
+        "Nodes": connected_nodes
+    }
+
+    # CSVファイルに自ノードのデータを追加
+    update_csv(own_node_data)
+
     while True:
         try:
             data = conn.recv(1024)
@@ -39,31 +50,26 @@ def handle_client(conn, addr):
             decoded_data = data.decode()
             print('Received data:', decoded_data)
             
-            # 受け取ったデータをCSVに格納
             node_data = parse_data(decoded_data)
             if node_data:
                 update_csv(node_data)
-                
-                # クライアントの接続オブジェクトをトラッキング
+
                 if conn not in received_clients:
                     received_clients.append(conn)
                 
-                # すべてのクライアントからデータを受信したか確認
                 if len(received_clients) == expected_clients:
                     print('All clients data received. Processing...')
                     try:
-                        param_dict = calc.extract_from_csv_norm()  # param_dictをcalc.extract_from_csvで更新
-                        print('param_dict after extract_from_csv_norm:', param_dict)  # 追加: param_dict の内容を確認
-                        
+                        param_dict = calc.extract_from_csv_norm()
+                        print('param_dict after extract_from_csv_norm:', param_dict)
+
                         cluster_head = calc.head_selection(param_dict)
                         for client in received_clients:
                             send_cluster_head(client, cluster_head)
-                        
-                        # 受信したクライアントリストをクリア
+
                         received_clients = []
                         time.sleep(3)
 
-                        # Flag処理(Test)
                         if cluster_head == Node_ID:
                             new_flag = 'True'
                         else:
@@ -82,11 +88,10 @@ def handle_client(conn, addr):
 
 def parse_data(data):
     try:
-        # データは"Node_ID,Battery,Nodes"のフォーマットで送信されると仮定
         parts = data.split(',')
         node_id = int(parts[0].strip())
         battery = int(parts[1].strip())
-        nodes = int(parts[2].strip())  # ノードはスペース区切りのリストと仮定
+        nodes = int(parts[2].strip())
         return {"Node_ID": node_id, "Battery": battery, "Nodes": nodes}
     except Exception as e:
         print(f"Failed to parse data: {e}")
@@ -105,9 +110,9 @@ def read_csv(file_path):
     try:
         with open(file_path, 'r') as file:
             lines = file.readlines()
-            for line in lines[1:]:  # ヘッダー行をスキップ
+            for line in lines[1:]:
                 parts = line.strip().split(',')
-                if len(parts) >= 3:  # 正しい形式の行だけを処理
+                if len(parts) >= 3:
                     try:
                         node_id = int(parts[0].strip())
                         battery = int(parts[1].strip())
@@ -122,7 +127,7 @@ def read_csv(file_path):
 def write_csv(file_path, data):
     try:
         with open(file_path, 'w') as file:
-            file.write("Node_ID,Battery,Nodes\n")  # ヘッダーを書き込む
+            file.write("Node_ID,Battery,Nodes\n")
             for entry in data:
                 file.write(f"{entry['Node_ID']},{entry['Battery']},{entry['Nodes']}\n")
 
@@ -132,13 +137,13 @@ def write_csv(file_path, data):
                 l = l.rstrip(',')
                 l = l.rstrip('\n')
                 Data.append(l.split(','))
-        print('CSV Data:', Data)  # 追加: CSVの内容を確認
+        print('CSV Data:', Data)
 
     except OSError as e:
         print(f"Failed to write CSV: {e}")
 
 def update_csv(new_data):
-    global param_dict  # 追加: param_dict をグローバル変数として宣言
+    global param_dict
     if file_exists(csv_file):
         data = read_csv(csv_file)
         updated = False
@@ -165,8 +170,8 @@ def send_cluster_head(client, cluster_head):
         print(f"Failed to send cluster head info: {e}")
 
 if __name__ == '__main__':
-    # boot.connect_home_wifi()
     boot.ap_activate()
+
     start_server()
 
     while True:

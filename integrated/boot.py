@@ -4,6 +4,7 @@ import webrepl
 import urequests
 import machine
 import time
+import _thread
 
 from machine import RTC
 from machine import Pin, SoftI2C
@@ -65,7 +66,7 @@ def connect_lab_wifi(timeout = 10):
             while True:
                 
                 if wifi.ifconfig()[0].split(".")[0] == "192":
-                    p2.on()
+                    # p2.on()
                     endFlag = True
                     print("----  wifi is connected -----")
                     print(f"----[{wifi.ifconfig()[0]}]に接続----")
@@ -184,6 +185,7 @@ def flag():
 print('booted system')
 
 if __name__ == '__main__':
+    execfile('get_current.py')
     flag()
     # execfile('ch_main.py')
     # execfile('debug.py')

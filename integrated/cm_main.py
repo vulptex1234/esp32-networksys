@@ -4,6 +4,7 @@ import time
 import _thread
 import random
 import machine
+from get_current import remaining_battery_percentage
 
 s = None
 
@@ -33,8 +34,8 @@ def send_to_server():
                 
                 with open('ID.txt', 'r') as file:
                     Node_ID = int(file.readline())
-                Battery = random.randint(0,100)
-                Nodes_number = 4
+                Battery = int(remaining_battery_percentage)
+                Nodes_number = 2 #接続可能ノード数
                 msg = f'{Node_ID},{Battery},{Nodes_number}'
                 
                 try:
