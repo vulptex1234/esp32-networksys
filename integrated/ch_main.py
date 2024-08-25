@@ -1,3 +1,4 @@
+
 import boot
 import calc
 import socket
@@ -5,6 +6,7 @@ import time
 import _thread
 import machine
 from get_current import remaining_battery_percentage
+from boot import connected_nodes, expected_clients
 
 PORT = 80
 listen_socket = None
@@ -13,9 +15,9 @@ param_dict = {}
 with open('ID.txt', 'r') as file:
     Node_ID = int(file.readline().strip())
 
-expected_clients = 2
+# expected_clients = 4
 received_clients = []
-connected_nodes = 2  # 例: ハードコードで5と設定
+# connected_nodes = 3 
 
 def start_server():
     global listen_socket

@@ -5,6 +5,7 @@ import _thread
 import random
 import machine
 from get_current import remaining_battery_percentage
+from boot import connected_nodes
 
 s = None
 
@@ -35,8 +36,8 @@ def send_to_server():
                 with open('ID.txt', 'r') as file:
                     Node_ID = int(file.readline())
                 Battery = int(remaining_battery_percentage)
-                Nodes_number = 2 #接続可能ノード数
-                msg = f'{Node_ID},{Battery},{Nodes_number}'
+                # Nodes_number = 3
+                msg = f'{Node_ID},{Battery},{connected_nodes}'
                 
                 try:
                     s.sendall(msg.encode())

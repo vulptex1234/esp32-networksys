@@ -42,7 +42,7 @@ if file_exists(cumulative_energy_file):
 else:
     cumulative_energy_consumed_Wh = 0
 
-battery_capacity_mAh = 2000  # バッテリー容量設定
+battery_capacity_mAh = 500  # バッテリー容量設定
 battery_capacity_Wh = (battery_capacity_mAh * 5.0) / 1000  # ESP32の定格電圧5.0V
 
 # ファイルのヘッダー書き込み
@@ -87,7 +87,7 @@ def exec():
         print(f"Remaining Battery: {remaining_battery_percentage:.2f}%")
 
         # CSVファイルに時間と残量を書き込む
-        current_time = time.time()  # 現在のUNIX時間を取得
+        current_time = time.time()
         with open('remaining_battery.csv', 'a') as f:
             f.write(f"{current_time},{remaining_battery_percentage:.2f}\n")
             f.flush()  # データを即座にディスクに書き込む

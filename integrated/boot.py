@@ -6,6 +6,10 @@ import machine
 import time
 import _thread
 
+from get_current import remaining_battery_percentage
+
+
+
 from machine import RTC
 from machine import Pin, SoftI2C
 p2 = Pin(2, Pin.OUT)
@@ -16,6 +20,17 @@ blue = Pin(27, Pin.OUT)
 machine.freq(240000000)
 
 hm_flag = False
+###################
+##    set up     ##
+###################
+connected_nodes = 2
+expected_clients = 4
+
+def check():
+    with open('ID.txt', 'r') as file:
+        Node_ID = int(file.readline())
+
+    print(f"Node_ID:{Node_ID},Nodes:{connected_nodes},battery:{remaining_battery_percentage}")
 
 ##################################
 ##    Network Configuration     ##
@@ -165,6 +180,7 @@ def ap_deactivate():
 ##           System             ##
 ##################################
 def flag():
+    current_time = time.time()
     try:
         with open('flag.txt', 'r') as f:
             flag = f.read().strip()
@@ -174,6 +190,8 @@ def flag():
                 execfile('cm_main.py')
             elif flag == 'True':
                 print("execute CH mode")
+                with open('how_many_times.csv', 'a') as f:
+                    f.write(f"{current_time},1\n")
                 execfile('ch_main.py')
             else:
                 print("Invalid flag value")
@@ -182,6 +200,7 @@ def flag():
         print(f"An error occurred: {e}")
 
 
+check()
 print('booted system')
 
 if __name__ == '__main__':
