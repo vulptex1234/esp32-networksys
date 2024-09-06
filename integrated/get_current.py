@@ -42,7 +42,7 @@ if file_exists(cumulative_energy_file):
 else:
     cumulative_energy_consumed_Wh = 0
 
-battery_capacity_mAh = 500  # バッテリー容量設定
+battery_capacity_mAh = 100  # バッテリー容量設定
 battery_capacity_Wh = (battery_capacity_mAh * 5.0) / 1000  # ESP32の定格電圧5.0V
 
 # ファイルのヘッダー書き込み

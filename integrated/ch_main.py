@@ -79,6 +79,7 @@ def handle_client(conn, addr):
                         with open('flag.txt', 'w') as file:
                             file.write(new_flag)
 
+                        boot.p2.off()
                         machine.reset()
 
                     except ValueError as ve:

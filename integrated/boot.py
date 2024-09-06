@@ -23,7 +23,7 @@ hm_flag = False
 ###################
 ##    set up     ##
 ###################
-connected_nodes = 2
+connected_nodes = 5
 expected_clients = 4
 
 def check():
@@ -31,6 +31,7 @@ def check():
         Node_ID = int(file.readline())
 
     print(f"Node_ID:{Node_ID},Nodes:{connected_nodes},battery:{remaining_battery_percentage}")
+
 
 ##################################
 ##    Network Configuration     ##
@@ -190,7 +191,7 @@ def flag():
                 execfile('cm_main.py')
             elif flag == 'True':
                 print("execute CH mode")
-                with open('how_many_times.csv', 'a') as f:
+                with open('how_many_times.csv', 'a+') as f:
                     f.write(f"{current_time},1\n")
                 execfile('ch_main.py')
             else:

@@ -68,6 +68,7 @@ def send_to_server():
     else:
         print("Wi-Fi connection failed")
         send_to_server()
+    boot.p2.off()
 
 if __name__ == '__main__':
     _thread.start_new_thread(send_to_server, ())
