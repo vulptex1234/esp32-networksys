@@ -65,14 +65,19 @@ def handle_client(conn, addr):
                         param_dict = calc.extract_from_csv_norm()
                         print('param_dict after extract_from_csv_norm:', param_dict)
 
+                        # cluster_head = calc.leach(param_dict) #leachの時
                         cluster_head = calc.head_selection(param_dict)
+                        # cluster_head_ID = cluster_head[0] #leachの時
+                        cluster_head_ID = cluster_head
+
+                        
                         for client in received_clients:
                             send_cluster_head(client, cluster_head)
 
                         received_clients = []
                         time.sleep(3)
 
-                        if cluster_head == Node_ID:
+                        if cluster_head_ID == Node_ID:
                             new_flag = 'True'
                         else:
                             new_flag = 'False'
@@ -187,3 +192,4 @@ if __name__ == '__main__':
             print(f"Accept error: {e}")
             continue
         time.sleep(1)
+

@@ -1,0 +1,3 @@
+HOME_WIFI_PASS = 'o.kyohei.0524'
+LAB_WIFI_PASS = '11n-ky56$HDxgp'
+WEBREPL_PASS = 'cdsl'

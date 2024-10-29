@@ -1,5 +1,6 @@
 import math
 import ch_main
+import random
 
 def normalize():
     with open('node_data.csv', 'r') as file:
@@ -108,4 +109,8 @@ def head_selection(param_dict):
     if not param_dict:
         raise ValueError("param_dict is empty")
     cluster_head = min(param_dict, key=param_dict.get)
+    return cluster_head
+
+def leach(param_dict):
+    cluster_head = random.choice(list(param_dict.items()))
     return cluster_head

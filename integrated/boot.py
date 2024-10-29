@@ -58,42 +58,47 @@ def wifiscan():
             wifiAPDict.append(wl[0].decode('utf-8'))
     return wifiAPDict
 
-def connect_lab_wifi(timeout = 10):
+def connect_lab_wifi(timeout=10, retry_limit=3):
     global wifi
 
     wifi.active(False)
     time.sleep(1)
     wifi.active(True)
 
-    
     if wifi.ifconfig()[0].split(".")[0] == "192":
         wifi.disconnect()
-    else:
-        pass
-    
-    endFlag = False
+
     wifiName = wifiscan()
     print(wifiName)
+
+    retry_count = 0
+    connected = False
 
     for wn in wifiName:
         if wn in SSID_NAME_LAB:
             print(f"[{wn}]に接続します")
             wifi.connect(wn, LAB_WIFI_PASS)
-            while True:
-                
+
+            start_time = time.time()
+            while time.time() - start_time < timeout:
                 if wifi.ifconfig()[0].split(".")[0] == "192":
-                    # p2.on()
-                    endFlag = True
-                    print("----  wifi is connected -----")
-                    print(f"----[{wifi.ifconfig()[0]}]に接続----")
+                    connected = True
+                    print("---- Wi-Fiに接続されました ----")
                     webrepl.start(password = WEBREPL_PASS)
-                    break
+                    p2.on()
+                    return True
                 else:
                     time.sleep(1)
-            if endFlag == True:
+
+            retry_count += 1
+            print(f"接続失敗。リトライ {retry_count}/{retry_limit} 回")
+
+            if retry_count >= retry_limit:
+                print("Wi-Fi接続に失敗しました。リトライ回数を超過しました。")
                 break
-        if endFlag == True:
-            break
+
+    if not connected:
+        print("すべての試行が失敗しました。Wi-Fiに接続できませんでした。")
 
 def connect_home_wifi(timeout = 10):
     global wifi
