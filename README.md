@@ -33,3 +33,18 @@ extract_from_csv() extracts 2 values from 'normalized_node_data.csv' and call si
 
 ### sim_score()
 sim_score() calculates euclidian distance using given 2 arguments from extract_from_csv().
+
+# Files need to be edited
+## ID.txt
+set unique number
+
+## flag.txt
+set "True" for initial cluster head
+
+set "False" for initial cluster member
+
+## remaining_battery.csv, how_many_times.csv
+delete file before starting experiment.
+
+## cumulative_energy.txt
+write "0" or delete file before start experiment 
